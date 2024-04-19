@@ -1,36 +1,45 @@
 ﻿using AsyncMvvm.Model;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using Xceed.Wpf.Toolkit;
 
 namespace AsyncMvvm.ViewModels
 {
-    internal class StandardWpfViewModel : INotifyPropertyChanged
+    public class StandardWpfViewModel : INotifyPropertyChanged
     {
         private readonly PrimeNumberCalculator calculator = new ();
         private long lastPrimeNumber = 0;
-        private long number = 0;
-        private bool numberIsPrime = false;
-        private Task? searchForPrimeNumbers;
-        private ICommand? checkSync;
-        private ICommand? startSearch;
-        private ICommand? startSearchInTask;
-        private ICommand? startSearchInTaskAsync;
-        private ICommand? startSearchInTaskAsyncAsync;
-        private ICommand? startSearchAsync;
-        private ICommand? startSearchAsyncInTask;
-        private ICommand? startSearchAsyncTaskAsync;
-        private ICommand? stopSearch;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public StandardWpfViewModel()
         {
             this.calculator.NewPrimeNumberFound += Calculator_NewPrimeNumberFound;
+
+            // sync
+            this.StartSearch = new IntCommandHandler(this.calculator.StartSearch, () => !this.calculator.IsSearching);
+            this.StartSearchRunTaskSyncCommand = new VoidCommandHandler(this.SearchRunTask, () => !this.calculator.IsSearching);
+            
+            // async command
+            this.StartSearchRunTaskAsync = new AsyncCommand(this.calculator.StartSearchRunTask);
+            this.StartSearchRunTaskAsyncAsync = new AsyncCommand(this.calculator.StartSearchRunTaskAsync);
+            this.StartSearchAsyncRunTask = new AsyncCommand(this.calculator.StartSearchAsyncRunTaskAction);
+            this.StartSearchAsyncAwaitRunTaskAction = new AsyncCommand(this.calculator.StartSearchAsyncAwaitRunTaskActionAwaitAsyncTask);
+            this.StartSearchAsyncAwaitRunTask = new AsyncCommand(this.calculator.StartSearchAsyncRunTask);
+
+            // await async command
+            this.AwaitStartSearchRunTaskAsync = new AwaitAsyncCommand(this.calculator.StartSearchRunTask);
+
+            // start async command
+            this.StartCreateSearchTask = new AsyncCommandStart(this.calculator.CreateSearchTask);
+            this.StartStartSearchAsyncTask = new AsyncCommandStart(this.calculator.StartSearchAsyncTask);
+            this.StartStartSearchAsyncTaskAsync = new AsyncCommandStart(this.calculator.StartSearchAsyncTaskAsync);
+
+            this.StartSearchAsyncTask = new AsyncCommand(this.calculator.StartSearchAsyncTask);
+            this.StartSearchAsyncTaskAsync = new AsyncCommand(this.calculator.StartSearchAsyncTaskAsync);
+
+            // stop
+            this.StopSearch = new VoidCommandHandler(this.calculator.StopSearch, () => true);
         }
 
         public long LastPrimeNumber 
@@ -45,101 +54,33 @@ namespace AsyncMvvm.ViewModels
             }
         }
 
-        public long Number
-        {
-            get => this.number;
-            set
-            {
-                if (value == this.number) return;
+        public ICommand StartSearch { get; }
 
-                this.number = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.Number)));
-            }
-        }
+        public ICommand StartSearchRunTaskSyncCommand { get; }
 
-        public bool NumberIsPrime
-        {
-            get => this.numberIsPrime;
-            set
-            {
-                if (value == this.numberIsPrime) return;
+        public ICommand StartSearchRunTaskAsync { get; }
 
-                this.numberIsPrime = value;
-                this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(this.NumberIsPrime)));
-            }
-        }
+        public ICommand AwaitStartSearchRunTaskAsync { get; }
 
-        public ICommand StartSearch
-        {
-            get
-            {
-                return this.startSearch ??= new CommandHandler(this.calculator.StartSearch, () => !this.calculator.IsSearching);
-            }
-        }
+        public ICommand StartCreateSearchTask { get; }
 
-        public ICommand StartSearchInTask
-        {
-            get
-            {
-                return this.startSearchInTask ??= new StopCommandHandler(this.SearchInTask, () => !this.calculator.IsSearching);
-            }
-        }
+        public ICommand StartStartSearchAsyncTask { get; }
 
-        public ICommand StartSearchInTaskAsync
-        {
-            get
-            {
-                return this.startSearchInTaskAsync ??= new AsyncCommand(this.calculator.StartSearchInTask);
-            }
-        }
+        public ICommand StartStartSearchAsyncTaskAsync { get; }
 
-        public ICommand AwaitStartSearchInTaskAsync
-        {
-            get
-            {
-                return new AwaitAsyncCommand(this.calculator.StartSearchInTask);
-            }
-        }
+        public ICommand StartSearchRunTaskAsyncAsync { get; }
 
-        public ICommand StartSearchInTaskAsyncAsync
-        {
-            get
-            {
-                return this.startSearchInTaskAsyncAsync ??= new AsyncCommand(this.calculator.StartSearchInTaskAsync);
-            }
-        }
+        public ICommand StartSearchAsyncRunTask { get; }
 
-        public ICommand StartSearchAsync
-        {
-            get
-            {
-                return this.startSearchAsync ??= new AsyncCommand(this.calculator.StartSearchAsync);
-            }
-        }
+        public ICommand StartSearchAsyncAwaitRunTaskAction { get; }
 
-        public ICommand StartSearchAsyncInTask
-        {
-            get
-            {
-                return this.startSearchAsyncInTask ??= new AsyncCommand(this.calculator.StartSearchAsyncInTask);
-            }
-        }
+        public ICommand StartSearchAsyncAwaitRunTask { get; }
 
-        public ICommand StartSearchAsyncTaskAsync
-        {
-            get
-            {
-                return this.startSearchAsyncTaskAsync ??= new AsyncCommand(this.calculator.StartSearchAsyncTaskAsync);
-            }
-        }
+        public ICommand StartSearchAsyncTask { get; }
 
-        public ICommand StopSearch
-        {
-            get
-            {
-                return this.stopSearch ??= new StopCommandHandler(this.calculator.StopSearch, () => true);
-            }
-        }
+        public ICommand StartSearchAsyncTaskAsync { get; }
+
+        public ICommand StopSearch { get; }
 
         private void Calculator_NewPrimeNumberFound(object sender, PrimeNumberEventArgs e)
         {
@@ -147,25 +88,12 @@ namespace AsyncMvvm.ViewModels
             this.LastPrimeNumber = e.Number;
         }
 
-        private void CheckNumberSync()
-        {
-            if (this.searchForPrimeNumbers != null ||
-                this.calculator.IsSearching)
-            {
-                return;
-            }
-
-            this.calculator.CurrentNumber = this.number;
-            this.calculator.CheckCurrentNumber();
-            this.NumberIsPrime = this.calculator.IsPrime;
-        }
-
-        private void SearchInTask()
+        private void SearchRunTask()
         {
             Console.WriteLine("-------------------------------------------------------------------");
-            Console.WriteLine($"{nameof(this.SearchInTask)} called in {Thread.CurrentThread.Name}.");
-            this.calculator.StartSearchInTask(1);
-            Console.WriteLine($"{nameof(this.SearchInTask)} called in {Thread.CurrentThread.Name} done.");
+            Console.WriteLine($"{nameof(this.SearchRunTask)} called in {Thread.CurrentThread.Name}.");
+            this.calculator.StartSearchRunTask(1);
+            Console.WriteLine($"{nameof(this.SearchRunTask)} called in {Thread.CurrentThread.Name} done.");
         }
     }
 }

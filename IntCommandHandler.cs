@@ -7,7 +7,7 @@ namespace AsyncMvvm
     /// </summary>
     /// <param name="action">Action to be executed by the command</param>
     /// <param name="canExecute">A bolean property to containing current permissions to execute the command</param>
-    public class CommandHandler(Action<int> action, Func<bool> canExecute) : ICommand
+    public class IntCommandHandler(Action<int> action, Func<bool> canExecute) : ICommand
     {
         /// <summary>
         /// Wires CanExecuteChanged event 

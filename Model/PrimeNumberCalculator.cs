@@ -10,6 +10,7 @@ namespace AsyncMvvm.Model
     internal class PrimeNumberCalculator
     {
         private long currentNumber = 0;
+        private int searchLevel = 0;
 
         public event PrimeNumberEventHandler? NewPrimeNumberFound;
 
@@ -66,9 +67,9 @@ namespace AsyncMvvm.Model
         /// This starts a seperate task and is therefore executy async.
         /// </summary>
         /// <returns>The task that is executed. The task can be awaited but doesn't need to.</returns>
-        public Task StartSearchInTask(int level = 0)
+        public Task StartSearchRunTask(int level = 0)
         {
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchInTask)} ...");
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchRunTask)} ...");
 
             if (this.IsSearching)
             {
@@ -82,7 +83,7 @@ namespace AsyncMvvm.Model
                 Search(level + 1);
             });
 
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchInTask)} done.");
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchRunTask)} done.");
 
             return t;
         }
@@ -91,32 +92,33 @@ namespace AsyncMvvm.Model
         /// This starts a seperate task and is therefore executy async.
         /// </summary>
         /// <returns></returns>
-        public async Task StartSearchInTaskAsync(int level = 0)
+        public async Task StartSearchRunTaskAsync(int level = 0)
         {
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchInTaskAsync)} ...");
-            await StartSearchInTask(level + 1);
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchInTaskAsync)} done.");
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchRunTaskAsync)} ...");
+            await StartSearchRunTask(level + 1);
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchRunTaskAsync)} done.");
         }
 
-        public async Task StartSearchAsync(int level = 0)
+        public async Task StartSearchAsyncRunTaskAction(int level = 0)
         {
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsync)} ...");
-            this.StartSearch(level + 1);
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsync)} done.");
-        }
-
-        public async Task StartSearchAsyncInTask(int level = 0)
-        {
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncInTask)} ...");
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncRunTaskAction)} ...");
             await Task.Run(() => this.StartSearch(level + 1));
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncInTask)} done.");
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncRunTaskAction)} done.");
         }
 
-        public async Task StartSearchAsyncInTaskAwaitTask(int level )
+        public async Task StartSearchAsyncAwaitRunTaskActionAwaitAsyncTask(int level)
         {
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncInTaskAwaitTask)} ...");
-            await Task.Run(async() => await StartSearchAsyncTask(level + 1));
-            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncInTaskAwaitTask)} done.");
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncAwaitRunTaskActionAwaitAsyncTask)} ...");
+            await Task.Run(async () => await StartSearchAsyncTask(level + 1));
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncAwaitRunTaskActionAwaitAsyncTask)} done.");
+        }
+
+        public async Task StartSearchAsyncRunTask(int level = 0)
+        {
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncRunTask)} ...");
+            this.searchLevel = level + 1;
+            await Task.Run(StartSearchWithLevel);
+            Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncRunTask)} done.");
         }
 
         public async Task StartSearchAsyncTaskAsync(int level = 0)
@@ -131,6 +133,14 @@ namespace AsyncMvvm.Model
             Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncTask)} ...");
             this.StartSearch(level + 1);
             Console.WriteLine($"{Tabs.Add(level)}{nameof(StartSearchAsyncTask)} done.");
+        }
+
+        public Task CreateSearchTask(int level)
+        {
+            return new Task(() =>
+            {
+                this.StartSearch(level + 1);
+            });
         }
 
         public void StartSearch(int level = 0)
@@ -168,6 +178,11 @@ namespace AsyncMvvm.Model
             }
 
             Console.WriteLine($"{Tabs.Add(level)}Search stopped.");
+        }
+
+        private async Task StartSearchWithLevel()
+        {
+            await StartSearchAsyncTask(this.searchLevel);
         }
     }
 }
