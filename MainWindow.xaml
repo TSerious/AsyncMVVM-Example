@@ -8,6 +8,8 @@
     Title="MainWindow"
     Width="800"
     Height="450"
+    Left="0"
+    Top="0"
     mc:Ignorable="d">
     <StackPanel>
         <Button Click="ClearConsole_Click">Clear Console</Button>
@@ -15,17 +17,40 @@
             <TabItem Header="StandardWPF">
                 <local:StandardWpf />
             </TabItem>
-            <TabItem Header="ReactiveUI - 1">
+            <TabItem Header="ReactiveUI - IsLoading is set">
                 <local:ReactiveControl
-                    x:Name="ReactiveControl1"
                     SetIsLoadingOnDeactivation="True"
-                    ViewName="1" />
+                    ViewMessage="IsLoading is set to false on deactivation."
+                    ViewTitle="1" />
             </TabItem>
-            <TabItem Header="ReactiveUI - 2">
+            <TabItem Header="ReactiveUI - IsLoading is NOT set">
                 <local:ReactiveControl
-                    x:Name="ReactiveControl2"
                     SetIsLoadingOnDeactivation="False"
-                    ViewName="2" />
+                    ViewMessage="IsLoading is NOT set to false on deactivation."
+                    ViewTitle="2" />
+            </TabItem>
+            <TabItem Header="ReactiveUI - Task in Activ.">
+                <local:ReactiveControl
+                    DoLongRunningActivation="True"
+                    RunTaskForLongRunningActivation="False"
+                    SetIsLoadingOnDeactivation="True"
+                    ViewMessage="A long running task is executed on activation."
+                    ViewTitle="3" />
+            </TabItem>
+            <TabItem Header="ReactiveUI - Task.Run in Activ.">
+                <local:ReactiveControl
+                    DoLongRunningActivation="True"
+                    RunTaskForLongRunningActivation="True"
+                    SetIsLoadingOnDeactivation="True"
+                    ViewMessage="A long running task is executed on activation but in a separate task."
+                    ViewTitle="4" />
+            </TabItem>
+            <TabItem Header="ReactiveUI - Async Activ.">
+                <local:ReactiveControl
+                    SetIsLoadingOnDeactivation="True"
+                    UseAsyncViewModel="True"
+                    ViewMessage="The HandleActivation method is async and therefore the commands are created to late for proper binding."
+                    ViewTitle="5" />
             </TabItem>
         </TabControl>
 
