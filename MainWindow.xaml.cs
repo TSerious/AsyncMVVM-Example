@@ -1,7 +1,6 @@
-﻿using ReactiveUI;
+﻿using AsyncMvvm.ViewModels;
 using System.Runtime.InteropServices;
 using System.Windows;
-using System.Reactive.Linq;
 
 namespace AsyncMvvm
 {
@@ -18,6 +17,9 @@ namespace AsyncMvvm
         private static partial IntPtr GetConsoleWindow();
 
         [LibraryImport("user32.dll")]
+        private static partial uint GetDpiForWindow(IntPtr hwnd);
+
+        [LibraryImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static partial bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 
@@ -26,18 +28,21 @@ namespace AsyncMvvm
         private static readonly IntPtr HWNDTOP = new(0);
         private readonly IntPtr consoleWindow;
 
-
         public MainWindow()
         {
             Thread.CurrentThread.Name = "UI thread";
+
             _ = AllocConsole();
             this.consoleWindow = GetConsoleWindow();
             this.InitializeComponent();
+            this.DataContext = this;
 
             Console.WriteLine($"Current (main/ui) thread is: {Thread.CurrentThread.Name}");
 
             this.Loaded += this.MainWindow_Loaded;
         }
+
+        public ReactiveControlViewModel AdditionalTab { get; } = new("10", "Test message");
 
         private void MainWindow_Loaded(object sender, EventArgs e)
         {
@@ -51,10 +56,13 @@ namespace AsyncMvvm
 
         private void AlignConsole()
         {
+            var dpi = GetDpiForWindow(this.consoleWindow);
+            int scaledX = (int)((this.Left + this.ActualWidth) * (dpi / 96));
+
             SetWindowPos(
                 this.consoleWindow,
                 HWNDTOP,
-                (int)(this.Left + this.ActualWidth) + 100,
+                scaledX,
                 0,
                 0,
                 0,

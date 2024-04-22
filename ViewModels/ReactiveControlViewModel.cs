@@ -12,12 +12,23 @@ namespace AsyncMvvm.ViewModels
     {
         private readonly PrimeNumberCalculator calculator = new();
         private int longRunningActivationTime = 1;
+        private readonly string title = "blub";
 
+        /// <inheritdoc/>
         public ViewModelActivator Activator { get; } = new();
 
-        public ReactiveControlViewModel(string title)
+        public ReactiveControlViewModel(
+            string title,
+            string message,
+            bool setIsLoadingOnDeactivation = true,
+            bool doLongRunningActivation = false,
+            bool runTaskForLongRunningActivation = false)
         {
-            this.ModelTitle = title;
+            this.title = title;
+            this.ModelTitleMessage = message;
+            this.SetIsLoadingOnDeactivation = setIsLoadingOnDeactivation;
+            this.DoLongRunningActivation = doLongRunningActivation;
+            this.RunTaskForLongRunningActivation = runTaskForLongRunningActivation;
 
             this.WhenActivated(disposables =>
             {
@@ -29,12 +40,23 @@ namespace AsyncMvvm.ViewModels
             });
         }
 
-        [Reactive]
-        public string ModelTitle { get; set; } = string.Empty;
+        /// <summary>
+        /// Gets or sets the title that is shown at the top.
+        /// </summary>
+        public string ModelTitle
+        {
+            get => this.title;
+        }
 
+        /// <summary>
+        /// Gets or sets a message that is shown at the top.
+        /// </summary>
         [Reactive]
-        public string ModelTitleMessage { get; set; } = string.Empty;
+        public string ModelTitleMessage { get; private set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this is loading.
+        /// </summary>
         [Reactive]
         public bool IsLoading { get; set; } = true;
 
@@ -47,11 +69,11 @@ namespace AsyncMvvm.ViewModels
         [Reactive]
         public long LastPrimeNumberBgThread { get; private set; } = 0;
 
-        public bool SetIsLoadingOnDeactivation { get; set; } = true;
+        public bool SetIsLoadingOnDeactivation { get; } = true;
 
-        public bool DoLongRunningActivation { get; set; } = false;
+        public bool DoLongRunningActivation { get; } = false;
 
-        public bool RunTaskForLongRunningActivation { get; set; } = false;
+        public bool RunTaskForLongRunningActivation { get; } = false;
 
         public ReactiveCommand<Unit, Unit>? StopSearch { get; private set; }
 

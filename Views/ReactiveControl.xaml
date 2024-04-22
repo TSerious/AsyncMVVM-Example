@@ -47,8 +47,8 @@
                     Stop search
                 </Button>
                 <StackPanel>
-                    <Button x:Name="StartSearchAsyncTask">Start async action</Button>
-                    <Button x:Name="StartSearchTaskAsyncTask">Start async task</Button>
+                    <Button x:Name="StartSearchAsyncTask" Background="Red">Start async action</Button>
+                    <Button x:Name="StartSearchTaskAsyncTask" Background="Red">Start async task</Button>
                     <Button x:Name="StartSearchInBackground">Start in background</Button>
                 </StackPanel>
             </StackPanel>

@@ -5,54 +5,80 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:AsyncMvvm.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:AsyncMvvm.ViewModels"
     Title="MainWindow"
-    Width="800"
-    Height="450"
+    Width="600"
+    Height="Auto"
     Left="0"
     Top="0"
     mc:Ignorable="d">
     <StackPanel>
+        <TextBlock>
+            This is an example application to demonstrate different ways to execute async commands.<LineBreak />
+            To do so you can start (and stop) the search for prime numbers.<LineBreak />
+            Take a look into the console (opened along with this application) to sea the call hierarchy.</TextBlock>
         <Button Click="ClearConsole_Click">Clear Console</Button>
         <TabControl>
             <TabItem Header="StandardWPF">
-                <local:StandardWpf />
+                <StackPanel>
+                    <Label>This control uses standard WPF functionality for (async) commands.</Label>
+                    <local:StandardWpf />
+                </StackPanel>
             </TabItem>
-            <TabItem Header="ReactiveUI - IsLoading is set">
-                <local:ReactiveControl
-                    SetIsLoadingOnDeactivation="True"
-                    ViewMessage="IsLoading is set to false on deactivation."
-                    ViewTitle="1" />
+            <TabItem Header="ReactiveUI Controls">
+                <StackPanel>
+                    <Label>Here are some ReactiveControls that do different stuff during their activation.</Label>
+                    <TabControl>
+                        <TabItem Header="1: IsLoading is set">
+                            <local:ReactiveControl
+                                SetIsLoadingOnDeactivation="True"
+                                ViewMessage="IsLoading is set to false on deactivation."
+                                ViewTitle="1" />
+                        </TabItem>
+                        <TabItem Header="2: IsLoading is NOT set">
+                            <local:ReactiveControl
+                                SetIsLoadingOnDeactivation="False"
+                                ViewMessage="IsLoading is NOT set to false on deactivation."
+                                ViewTitle="2" />
+                        </TabItem>
+                        <TabItem Header="3: Task in Activ.">
+                            <local:ReactiveControl
+                                DoLongRunningActivation="True"
+                                RunTaskForLongRunningActivation="False"
+                                SetIsLoadingOnDeactivation="True"
+                                ViewMessage="A long running task is executed on activation."
+                                ViewTitle="3" />
+                        </TabItem>
+                        <TabItem Header="4: Task.Run in Activ.">
+                            <local:ReactiveControl
+                                DoLongRunningActivation="True"
+                                RunTaskForLongRunningActivation="True"
+                                SetIsLoadingOnDeactivation="True"
+                                ViewMessage="A long running task is executed on activation but in a separate task."
+                                ViewTitle="4" />
+                        </TabItem>
+                        <TabItem Header="5: Async Activ.">
+                            <local:ReactiveControl
+                                SetIsLoadingOnDeactivation="True"
+                                UseAsyncViewModel="True"
+                                ViewMessage="The HandleActivation method is async and therefore the commands are created to late for proper binding."
+                                ViewTitle="5" />
+                        </TabItem>
+                    </TabControl>
+                </StackPanel>
             </TabItem>
-            <TabItem Header="ReactiveUI - IsLoading is NOT set">
-                <local:ReactiveControl
-                    SetIsLoadingOnDeactivation="False"
-                    ViewMessage="IsLoading is NOT set to false on deactivation."
-                    ViewTitle="2" />
-            </TabItem>
-            <TabItem Header="ReactiveUI - Task in Activ.">
-                <local:ReactiveControl
-                    DoLongRunningActivation="True"
-                    RunTaskForLongRunningActivation="False"
-                    SetIsLoadingOnDeactivation="True"
-                    ViewMessage="A long running task is executed on activation."
-                    ViewTitle="3" />
-            </TabItem>
-            <TabItem Header="ReactiveUI - Task.Run in Activ.">
-                <local:ReactiveControl
-                    DoLongRunningActivation="True"
-                    RunTaskForLongRunningActivation="True"
-                    SetIsLoadingOnDeactivation="True"
-                    ViewMessage="A long running task is executed on activation but in a separate task."
-                    ViewTitle="4" />
-            </TabItem>
-            <TabItem Header="ReactiveUI - Async Activ.">
-                <local:ReactiveControl
-                    SetIsLoadingOnDeactivation="True"
-                    UseAsyncViewModel="True"
-                    ViewMessage="The HandleActivation method is async and therefore the commands are created to late for proper binding."
-                    ViewTitle="5" />
+            <TabItem Content="{Binding AdditionalTab}" Header="Additional ReactiveUI Control">
+                <TabItem.ContentTemplate>
+                    <DataTemplate DataType="vm:ReactiveControlViewModel">
+                        <StackPanel>
+                            <TextBlock>
+                                This is a better way to bind the model to a control.<LineBreak />
+                                Notice (in the console) that the model and the control are only activated when they are visible.</TextBlock>
+                            <local:ReactiveControl DataContext="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.ContentTemplate>
             </TabItem>
         </TabControl>
-
     </StackPanel>
 </Window>

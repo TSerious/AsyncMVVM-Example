@@ -1,35 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using AsyncMvvm.ViewModels;
 using ReactiveUI;
 
 namespace AsyncMvvm.Views
 {
     /// <summary>
-    /// Interaction logic for ReactiveControl1.xaml
+    /// Interaction logic for ReactiveControl.xaml
     /// </summary>
     public partial class ReactiveControl : ReactiveUserControl<ReactiveControlViewModel>, IViewFor<ReactiveControlViewModel>
     {
         public ReactiveControl()
         {
             InitializeComponent();
-
-            
 
             this.WhenActivated(disposables =>
             {
@@ -40,31 +24,74 @@ namespace AsyncMvvm.Views
             });
         }
 
+        /// <summary>
+        /// Gets or sets the text that is also used for <see cref="ReactiveControlViewModel.ModelTitle"/>.
+        /// </summary>
+        /// <remarks>The purpose of this property is only to set 
+        /// <see cref="ReactiveControlViewModel.ModelTitle"/>in xaml </remarks>
         public string ViewTitle { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Gets or sets the text that is also used for <see cref="ReactiveControlViewModel.ModelTitleMessage"/>.
+        /// </summary>
+        /// <remarks>The purpose of this property is only to set 
+        /// <see cref="ReactiveControlViewModel.ModelTitleMessage"/>in xaml </remarks>
         public string ViewMessage { get; set; } = string.Empty;
 
+        /// <summary>
+        /// See <see cref="ReactiveControlViewModel.SetIsLoadingOnDeactivation"/>.
+        /// </summary>
+        // <remarks>The purpose of this property is only to set 
+        /// <see cref="ReactiveControlViewModel.SetIsLoadingOnDeactivation"/>in xaml </remarks>
         public bool SetIsLoadingOnDeactivation { get; set; } = true;
 
+        /// <summary>
+        /// See <see cref="ReactiveControlViewModel.DoLongRunningActivation"/>.
+        /// </summary>
+        // <remarks>The purpose of this property is only to set 
+        /// <see cref="ReactiveControlViewModel.DoLongRunningActivation"/>in xaml </remarks>
         public bool DoLongRunningActivation { get; set; } = false;
 
+        /// <summary>
+        /// See <see cref="ReactiveControlViewModel.RunTaskForLongRunningActivation"/>.
+        /// </summary>
+        // <remarks>The purpose of this property is only to set 
+        /// <see cref="ReactiveControlViewModel.RunTaskForLongRunningActivation"/>in xaml </remarks>
         public bool RunTaskForLongRunningActivation { get; set; } = false;
 
+        /// <summary>
+        /// See <see cref="ReactiveControlViewModel.UseAsyncViewModel"/>.
+        /// </summary>
+        // <remarks>The purpose of this property is only to set 
+        /// <see cref="ReactiveControlViewModel.UseAsyncViewModel"/>in xaml </remarks>
         public bool UseAsyncViewModel { get; set; } = false;
 
         private void HandleActivation(CompositeDisposable disposables)
         {
-            Console.WriteLine($"{this}: {this.ViewTitle}: Activation");
+            
 
-            this.ViewModel ??= this.UseAsyncViewModel 
-                ? new AsyncActivationViewModel(this.ViewTitle) 
-                : new ReactiveControlViewModel(this.ViewTitle);
+            if (this.DataContext is not ReactiveControlViewModel vm)
+            {
+                this.ViewModel ??= this.UseAsyncViewModel
+                    ? new AsyncActivationViewModel(
+                        this.ViewTitle,
+                        this.ViewMessage,
+                        this.SetIsLoadingOnDeactivation,
+                        this.DoLongRunningActivation,
+                        this.RunTaskForLongRunningActivation)
+                    : new ReactiveControlViewModel(
+                        this.ViewTitle,
+                        this.ViewMessage,
+                        this.SetIsLoadingOnDeactivation,
+                        this.DoLongRunningActivation,
+                        this.RunTaskForLongRunningActivation);
+            }
+            else if (this.ViewModel == null)
+            {
+                this.ViewModel = vm;
+            }
 
-            this.ViewModel.ModelTitle = this.ViewTitle;
-            this.ViewModel.ModelTitleMessage = this.ViewMessage;
-            this.ViewModel.SetIsLoadingOnDeactivation = this.SetIsLoadingOnDeactivation;
-            this.ViewModel.DoLongRunningActivation = this.DoLongRunningActivation;
-            this.ViewModel.RunTaskForLongRunningActivation = this.RunTaskForLongRunningActivation;
+            Console.WriteLine($"{this}: {this.ViewModel?.ModelTitle}: Activation");
 
             this.DataContext = this.ViewModel;
 
@@ -80,7 +107,7 @@ namespace AsyncMvvm.Views
 
         private void HandleDeactivation()
         {
-            Console.WriteLine($"{this}: {this.ViewTitle}: DEactivation");
+            Console.WriteLine($"{this}: {this.ViewModel?.ModelTitle}: DEactivation");
         }
     }
 }
