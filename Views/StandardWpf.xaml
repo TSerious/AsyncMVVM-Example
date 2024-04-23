@@ -6,75 +6,108 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     DataContext="{Binding ViewModel}"
     mc:Ignorable="d">
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal">
-            <Label>Last found prime number:</Label>
-            <Label Content="{Binding LastPrimeNumber}" />
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0"
+            Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Label>Last found prime number:</Label>
+                <Label Content="{Binding LastPrimeNumber}" />
+            </StackPanel>
+            <Button Background="Green" Command="{Binding StopSearch}">Stop Search</Button>
+            <StackPanel Orientation="Horizontal">
+                <GroupBox Header="Sync">
+                    <StackPanel>
+                        <Label>Sync commands</Label>
+                        <Button
+                            HorizontalContentAlignment="Left"
+                            Background="red"
+                            Command="{Binding StartSearch}">
+                            Start search
+                        </Button>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchRunTaskSyncCommand}">Start search run task</Button>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Task.Run()">
+                    <StackPanel>
+                        <Label>Async commands</Label>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchRunTaskAsync}">Start search run task async</Button>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchRunTaskAsyncAsync}">Start search run task async async</Button>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchAsyncRunTask}">Start search async but run a task</Button>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchAsyncAwaitRunTaskAction}">Start search async and await a task running an action</Button>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchAsyncAwaitRunTask}">Start search async and await a task</Button>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <GroupBox Header="Await Async Commands">
+                    <StackPanel>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding AwaitStartSearchRunTaskAsync}">Await start search run task async</Button>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Start Async Command">
+                    <StackPanel>
+                        <Button HorizontalContentAlignment="Left" Command="{Binding StartCreateSearchTask}">Start create search task</Button>
+                        <Button
+                            HorizontalContentAlignment="Left"
+                            Background="red"
+                            Command="{Binding StartStartSearchAsyncTask}">
+                            Start start search async task
+                        </Button>
+                        <Button
+                            HorizontalContentAlignment="Left"
+                            Background="red"
+                            Command="{Binding StartStartSearchAsyncTaskAsync}">
+                            Start task start search async task
+                        </Button>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="async Task">
+                    <StackPanel>
+                        <Button
+                            HorizontalContentAlignment="Left"
+                            Background="red"
+                            Command="{Binding StartSearchAsyncTask}">
+                            Start search async task
+                        </Button>
+                        <Button
+                            HorizontalContentAlignment="Left"
+                            Background="red"
+                            Command="{Binding StartSearchAsyncTaskAsync}">
+                            Start search async task async
+                        </Button>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
         </StackPanel>
-        <Button Background="Green" Command="{Binding StopSearch}">Stop Search</Button>
-        <StackPanel Orientation="Horizontal">
-            <GroupBox Header="Sync">
-                <StackPanel>
-                    <Label>Sync commands</Label>
-                    <Button
-                        HorizontalContentAlignment="Left"
-                        Background="red"
-                        Command="{Binding StartSearch}">
-                        Start search
-                    </Button>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchRunTaskSyncCommand}">Start search run task</Button>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Task.Run()">
-                <StackPanel>
-                    <Label>Async commands</Label>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchRunTaskAsync}">Start search run task async</Button>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchRunTaskAsyncAsync}">Start search run task async async</Button>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchAsyncRunTask}">Start search async but run a task</Button>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchAsyncAwaitRunTaskAction}">Start search async and await a task running an action</Button>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartSearchAsyncAwaitRunTask}">Start search async and await a task</Button>
-                </StackPanel>
-            </GroupBox>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <GroupBox Header="Await Async Commands">
-                <StackPanel>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding AwaitStartSearchRunTaskAsync}">Await start search run task async</Button>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="Start Async Command">
-                <StackPanel>
-                    <Button HorizontalContentAlignment="Left" Command="{Binding StartCreateSearchTask}">Start create search task</Button>
-                    <Button
-                        HorizontalContentAlignment="Left"
-                        Background="red"
-                        Command="{Binding StartStartSearchAsyncTask}">
-                        Start start search async task
-                    </Button>
-                    <Button
-                        HorizontalContentAlignment="Left"
-                        Background="red"
-                        Command="{Binding StartStartSearchAsyncTaskAsync}">
-                        Start task start search async task
-                    </Button>
-                </StackPanel>
-            </GroupBox>
-            <GroupBox Header="async Task">
-                <StackPanel>
-                    <Button
-                        HorizontalContentAlignment="Left"
-                        Background="red"
-                        Command="{Binding StartSearchAsyncTask}">
-                        Start search async task
-                    </Button>
-                    <Button
-                        HorizontalContentAlignment="Left"
-                        Background="red"
-                        Command="{Binding StartSearchAsyncTaskAsync}">
-                        Start search async task async
-                    </Button>
-                </StackPanel>
-            </GroupBox>
-        </StackPanel>
-    </StackPanel>
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0">Found Prime Numbers</Label>
+            <CheckBox
+                x:Name="SyncBinding"
+                Grid.Row="1"
+                Checked="SyncBinding_Checked"
+                Unchecked="SyncBinding_Unchecked">
+                Enable Binding Sync.
+            </CheckBox>
+            <ListView
+                x:Name="FoundPrimeNumbers"
+                Grid.Row="3"
+                MaxHeight="300"
+                ScrollViewer.VerticalScrollBarVisibility="Visible" />
+        </Grid>
+    </Grid>
 </UserControl>
+

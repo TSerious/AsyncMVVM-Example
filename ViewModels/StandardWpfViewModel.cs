@@ -1,7 +1,7 @@
 ﻿using AsyncMvvm.Model;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
-using Xceed.Wpf.Toolkit;
 
 namespace AsyncMvvm.ViewModels
 {
@@ -14,7 +14,7 @@ namespace AsyncMvvm.ViewModels
 
         public StandardWpfViewModel()
         {
-            this.calculator.NewPrimeNumberFound += Calculator_NewPrimeNumberFound;
+            this.calculator.NewPrimeNumberFound += this.Calculator_NewPrimeNumberFound;
 
             // sync
             this.StartSearch = new IntCommandHandler(this.calculator.StartSearch, () => !this.calculator.IsSearching);
@@ -54,6 +54,8 @@ namespace AsyncMvvm.ViewModels
             }
         }
 
+        public ObservableCollection<long> FoundPrimeNumbers = [];
+
         public ICommand StartSearch { get; }
 
         public ICommand StartSearchRunTaskSyncCommand { get; }
@@ -84,8 +86,16 @@ namespace AsyncMvvm.ViewModels
 
         private void Calculator_NewPrimeNumberFound(object sender, PrimeNumberEventArgs e)
         {
-            //Console.WriteLine($"New prime number found in thread {Thread.CurrentThread.Name}");
             this.LastPrimeNumber = e.Number;
+
+            try
+            {
+                this.FoundPrimeNumbers.Add(e.Number);
+            }
+            catch
+            {
+                Console.WriteLine($"Can't add found prime number.");
+            }
         }
 
         private void SearchRunTask()
